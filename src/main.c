@@ -22,9 +22,19 @@ int main(int argc, char *argv[]) {
     if (strcmp(command_token, "exit") == 0)
       break;
     else if (strcmp(command_token, "echo") == 0) {
-      printf("%s\n", saveptr1);
-    } else
-      printf("%s: command not found\n", input);
+      printf("%s", saveptr1);
+    }
+    else if (strcmp(command_token, "type") == 0) {
+      if (strcmp(saveptr1, "type") == 0 || strcmp(saveptr1, "exit") == 0 ||
+          strcmp(saveptr1, "echo") == 0) {
+        printf("%s is a shell builtin", saveptr1);
+      }
+      else
+        printf("%s: not found", saveptr1);
+    }
+    else
+      printf("%s: command not found", input);
+    printf("\n");
   }
   return 0;
 }
