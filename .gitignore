@@ -54,3 +54,6 @@ dkms.conf
 build
 vcpkg_installed
 .vscode
+
+test.c
+test 

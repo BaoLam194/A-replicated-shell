@@ -1,6 +1,5 @@
+#include "helper.h"
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 int main(int argc, char *argv[]) {
   // Flush after every printf
@@ -29,8 +28,15 @@ int main(int argc, char *argv[]) {
           strcmp(saveptr1, "echo") == 0) {
         printf("%s is a shell builtin", saveptr1);
       }
-      else
-        printf("%s: not found", saveptr1);
+      else {
+        char *temp = check_exectable_file_in_path(saveptr1);
+        if (!temp)
+          printf("%s: not found", saveptr1);
+        else {
+          printf("%s is %s", saveptr1, temp);
+          free(temp); // Free the allocated memory
+        }
+      }
     }
     else
       printf("%s: command not found", input);
