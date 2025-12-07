@@ -22,18 +22,35 @@ char *check_executable_file_in_path(const char *file) {
 }
 
 bool check_path_to_dir(char *path, char *from, char **dest) {
-  if (path[0] == '/') { // Absolute path
-    if (access(path, X_OK) != 0) {
+  if (path[0] == '/' || path[0] == '~') { // Absolute path
+
+    char *copy_path;
+    if (path[0] == '~') {
+      char *home = strdup(getenv("HOME"));
+      copy_path = malloc(sizeof(char) * MAX_PATH_LENGTH);
+      copy_path[0] = '\0';
+      strcat(copy_path, home);
+      strcat(copy_path, path + 1);
+    }
+    else {
+      copy_path = strdup(path);
+    }
+    if (access(copy_path, X_OK) != 0) {
       // can not access (could be no execute permission
       // or path not exist)
       return false;
     }
     struct stat sb;
-    if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode)) {
+    if (stat(copy_path, &sb) == 0 && S_ISDIR(sb.st_mode)) {
       // path exists and is directory
+      if (path[0] == '~') {
+        *dest = strdup(copy_path);
+      }
+      free(copy_path);
       return true;
     }
     *dest = NULL;
+    free(copy_path);
     // else wrong
     return false;
   }
@@ -86,6 +103,7 @@ bool check_path_to_dir(char *path, char *from, char **dest) {
       if (count_2 < 0)
         return false; // unable to go lower
     }
+
     // Allocate memory and construct the new destination
     *dest = malloc(sizeof(char) * MAX_PATH_LENGTH);
     if (is_absolute) {
@@ -108,6 +126,7 @@ bool check_path_to_dir(char *path, char *from, char **dest) {
     for (int i = 0; i < to_remove; i++) {
       free(path_split_2[i]);
     }
+
     // check if the new destination is valid
     if (access(*dest, X_OK) != 0) {
       // can not access (could be no execute permission
