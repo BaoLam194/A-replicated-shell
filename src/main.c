@@ -1,7 +1,5 @@
 #include "helper.h"
 #include <stdio.h>
-#define MAX_COMMAND_LENGTH 1024
-#define MAX_ARGUMENT_COUNT 100
 
 int main(int argc, char *argv[]) {
   // Flush after every printf
@@ -39,9 +37,15 @@ int main(int argc, char *argv[]) {
     }
     else if (strcmp(command_token, "cd") == 0) {
       char *temp = strtok_r(NULL, " \t", &saveptr1);
-      if (check_path_to_dir(temp, cwd)) {
+      char *to = NULL;
+      if (check_path_to_dir(temp, cwd, &to)) {
         free(cwd);
-        cwd = strdup(temp);
+        if (to == NULL) // Absolute path
+          cwd = strdup(temp);
+        else {
+          cwd = strdup(to);
+          free(to);
+        }
       }
       else {
         printf("cd: %s: No such file or directory\n", temp);
@@ -77,7 +81,7 @@ int main(int argc, char *argv[]) {
         while (token != NULL) {
           argument_array[count++] = strdup(token);
           if (count >= MAX_ARGUMENT_COUNT) {
-            perror("More than 1024 argumeants!!! What are you doing :)");
+            perror("More than 100 argumeants!!! What are you doing?");
             exit(1);
           }
           token = strtok_r(NULL, " \t", &saveptr1);

@@ -3,6 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define MAX_COMMAND_LENGTH 1024
+#define MAX_ARGUMENT_COUNT 100
+#define MAX_PATH_LENGTH 1024
 
 // To support the type command
 #include <unistd.h> // for access function
@@ -19,4 +22,5 @@ char *check_executable_file_in_path(const char *file);
 
 // To support pwd, cd command
 #include <sys/stat.h>
-bool check_path_to_dir(const char *path, const char *from);
+bool check_path_to_dir(char *path, char *from, char **dest);
+int my_max(int a, int b);
