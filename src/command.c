@@ -100,7 +100,6 @@ bool check_path_to_dir(char *path, char *from, char **dest) {
       if (i != count_2 - 1)
         strcat(*dest, "/");
     }
-    printf("\n");
     free(dup_input_1);
     free(dup_input_2);
     for (int i = 0; i < count_1; i++) {
