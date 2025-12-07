@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,3 +16,7 @@ char *check_executable_file_in_path(const char *file);
 // To support execute programme
 #include <sys/types.h> // pid_t
 #include <sys/wait.h>  // wait(), waitpid()
+
+// To support pwd, cd command
+#include <sys/stat.h>
+bool check_path_to_dir(const char *path, const char *from);

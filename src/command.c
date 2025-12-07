@@ -20,3 +20,19 @@ char *check_executable_file_in_path(const char *file) {
   free(path);
   return NULL; // CANNOT find the file or no executable permission
 }
+
+bool check_path_to_dir(const char *path, const char *from) {
+  if (path[0] == '/') { // Absolute path
+    if (access(path, X_OK) != 0) {
+      // can not access (could be no execute permission
+      // or path not exist)
+      return false;
+    }
+    struct stat sb;
+    if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode)) {
+      // path exists and is directory
+      return true;
+    }
+  }
+  return false;
+}

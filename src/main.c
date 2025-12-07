@@ -6,8 +6,10 @@
 int main(int argc, char *argv[]) {
   // Flush after every printf
   setbuf(stdout, NULL);
+  char *cwd = getcwd(NULL, 0);
 
   while (1) {
+    // Handle cwd
     printf("$ ");
     char input[MAX_COMMAND_LENGTH];
     fgets(input, sizeof(input), stdin);
@@ -29,13 +31,21 @@ int main(int argc, char *argv[]) {
       printf("%s\n", saveptr1);
     }
     else if (strcmp(command_token, "pwd") == 0) { // pwd command
-      char *temp = getcwd(NULL, 0);
-      if (temp == NULL) {
+      if (cwd == NULL) {
         printf("Current working directory not found");
         exit(1);
       }
-      printf("%s\n", temp);
-      free(temp);
+      printf("%s\n", cwd);
+    }
+    else if (strcmp(command_token, "cd") == 0) {
+      char *temp = strtok_r(NULL, " \t", &saveptr1);
+      if (check_path_to_dir(temp, cwd)) {
+        free(cwd);
+        cwd = strdup(temp);
+      }
+      else {
+        printf("cd: %s: No such file or directory\n", temp);
+      }
     }
     else if (strcmp(command_token, "type") == 0) { // type command
       if (strcmp(saveptr1, "type") == 0 || strcmp(saveptr1, "exit") == 0 ||
@@ -88,5 +98,6 @@ int main(int argc, char *argv[]) {
       }
     }
   }
+  free(cwd);
   return 0;
 }
