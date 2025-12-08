@@ -26,38 +26,7 @@ int main(int argc, char *argv[]) {
       // It is built_in command
     }
     else { // check if command exists in path and executable
-      char *temp = check_executable_file_in_path(command_token);
-      if (!temp) {
-        printf("%s: command not found", input);
-        printf("\n");
-      }
-      else { // handle the arguement
-        char *argument_array[MAX_ARGUMENT_COUNT];
-        int count = 0;
-        argument_array[count++] = strdup(command_token);
-        char *token = strtok_r(NULL, " \t", &saveptr1);
-        while (token != NULL) {
-          argument_array[count++] = strdup(token);
-          if (count >= MAX_ARGUMENT_COUNT) {
-            perror("More than 100 argumeants!!! What are you doing?");
-            exit(1);
-          }
-          token = strtok_r(NULL, " \t", &saveptr1);
-        }
-        argument_array[count] = NULL;
-        pid_t pid = fork();
-        if (pid == 0) { // child process
-          execv(temp, argument_array);
-          printf("%s: command not found\n", command_token);
-          exit(1);
-        }
-        wait(NULL); // wait for child process
-
-        // free allocated memory
-        for (int i = 0; i < count; i++) {
-          free(argument_array[i]);
-        }
-      }
+      existing_command(command_token, &saveptr1);
     }
   }
   free(cwd);

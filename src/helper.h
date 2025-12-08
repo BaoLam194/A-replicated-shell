@@ -9,6 +9,7 @@
 
 // Command to execute
 bool built_in_command(char *command, char *argument_str, char **cwd, int *flag);
+void existing_command(char *command, char **argument_str);
 
 // To support the type command
 #include <unistd.h> // for access function
