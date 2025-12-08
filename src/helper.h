@@ -7,6 +7,9 @@
 #define MAX_ARGUMENT_COUNT 100
 #define MAX_PATH_LENGTH 1024
 
+// Command to execute
+bool built_in_command(char *command, char *argument_str, char **cwd, int *flag);
+
 // To support the type command
 #include <unistd.h> // for access function
 #ifdef _WIN32

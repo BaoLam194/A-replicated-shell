@@ -5,15 +5,15 @@ int main(int argc, char *argv[]) {
   // Flush after every printf
   setbuf(stdout, NULL);
   char *cwd = getcwd(NULL, 0);
-
-  while (1) {
+  int flag = 1;
+  while (flag) {
     // Handle cwd
     printf("$ ");
     char input[MAX_COMMAND_LENGTH];
     fgets(input, sizeof(input), stdin);
     // Remove trailing end-line and add null byte
     input[strcspn(input, "\n")] = '\0';
-
+    //
     // Tokenize the input
     char *saveptr1;
     char *command_token;
@@ -22,50 +22,8 @@ int main(int argc, char *argv[]) {
 
     // Take out the command only and check
     command_token = strtok_r(copy_input, " \t", &saveptr1);
-    if (strcmp(command_token, "exit") == 0) { // exit command
-      break;
-    }
-    else if (strcmp(command_token, "echo") == 0) { // echo command
-      printf("%s\n", saveptr1);
-    }
-    else if (strcmp(command_token, "pwd") == 0) { // pwd command
-      if (cwd == NULL) {
-        printf("Current working directory not found");
-        exit(1);
-      }
-      printf("%s\n", cwd);
-    }
-    else if (strcmp(command_token, "cd") == 0) {
-      char *temp = strtok_r(NULL, " \t", &saveptr1);
-      char *to = NULL;
-      if (check_path_to_dir(temp, cwd, &to)) {
-        free(cwd);
-        if (to == NULL) // Absolute path
-          cwd = strdup(temp);
-        else {
-          cwd = strdup(to);
-          free(to);
-        }
-      }
-      else {
-        printf("cd: %s: No such file or directory\n", temp);
-      }
-    }
-    else if (strcmp(command_token, "type") == 0) { // type command
-      if (strcmp(saveptr1, "type") == 0 || strcmp(saveptr1, "exit") == 0 ||
-          strcmp(saveptr1, "echo") == 0 || strcmp(saveptr1, "pwd") == 0) {
-        printf("%s is a shell builtin", saveptr1);
-      }
-      else { // if not built in
-        char *temp = check_executable_file_in_path(saveptr1);
-        if (!temp)
-          printf("%s: not found", saveptr1);
-        else {
-          printf("%s is %s", saveptr1, temp);
-          free(temp); // free the allocated memory
-        }
-      }
-      printf("\n");
+    if (built_in_command(command_token, saveptr1, &cwd, &flag)) {
+      // It is built_in command
     }
     else { // check if command exists in path and executable
       char *temp = check_executable_file_in_path(command_token);
