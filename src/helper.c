@@ -165,7 +165,8 @@ int my_max(int a, int b) { return (a > b) ? a : b; }
 // Parse the input and store number of arguments into count, count should be 0
 char **parse_input(char *input, int *count) {
   if (*count != 0) {
-    printf("You give wrong argument to parse input");
+    printf("You give no argument to parse input");
+    exit(1);
     return NULL;
   }
   int end = strlen(input);
@@ -190,6 +191,10 @@ char **parse_input(char *input, int *count) {
       else if (input[i] == '\"')
         flag = DOUBLE_QUOTE;
       else { // Normal case
+        if (cur_len >= MAX_ARGUMENT_COUNT - 1) {
+          printf("Argument too long: %d\n", cur_len);
+          exit(1);
+        }
         token[cur_len++] = input[i];
         token[cur_len] = '\0';
       }

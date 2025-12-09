@@ -5,8 +5,7 @@ int main(int argc, char *argv[]) {
   // Flush after every printf
   setbuf(stdout, NULL);
   char *cwd = getcwd(NULL, 0);
-  int flag = 1;
-  while (flag) {
+  while (1) {
     // Handle cwd
     printf("$ ");
     char input[MAX_COMMAND_LENGTH];
@@ -21,13 +20,21 @@ int main(int argc, char *argv[]) {
     memcpy(copy_input, input, sizeof(input));
     int count = 0;
     char **mod_input = parse_input(copy_input, &count);
+    if (!count) {
+      printf("No arguments provided \?\?\?\n");
+      return 0;
+    }
     // Take out the command only and check
-    if (built_in_command(mod_input, saveptr1, count, &cwd, &flag)) {
+    if (built_in_command(mod_input, saveptr1, count, &cwd)) {
       // It is built_in command
     }
     else { // check if command exists in path and executable
-      existing_command(command_token, &saveptr1);
+      existing_command(mod_input, count);
     }
+    for (int i = 0; i < count; i++) {
+      free(mod_input[i]);
+    }
+    free(mod_input);
   }
   free(cwd);
   return 0;

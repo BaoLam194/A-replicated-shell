@@ -8,9 +8,9 @@
 #define MAX_ARGUMENT_LENGTH 1024
 
 // Command to execute
-bool built_in_command(char **command, char *argument_str, int count, char **cwd,
-                      int *flag);
-void existing_command(char *command, char **argument_str);
+bool built_in_command(char **command, char *argument_str, int count,
+                      char **cwd);
+void existing_command(char **command, int count);
 char **parse_input(char *input, int *count);
 typedef enum { // use as
   NORMAL = 1 << 1,

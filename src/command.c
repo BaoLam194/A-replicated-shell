@@ -19,12 +19,12 @@ void type_command(char *argument) {
   printf("\n");
 }
 
-bool built_in_command(char **command, char *argument_str, int count, char **cwd,
-                      int *flag) {
+bool built_in_command(char **command, char *argument_str, int count,
+                      char **cwd) {
 
   char *command_token = command[0];
   if (strcmp(command_token, "exit") == 0) { // exit command
-    *flag = 0;
+    exit(0);
     return true;
   }
   else if (strcmp(command_token, "echo") == 0) { // echo command
@@ -73,37 +73,29 @@ bool built_in_command(char **command, char *argument_str, int count, char **cwd,
 }
 
 // Need to modify the saveptr so **
-void existing_command(char *command, char **argument_str) {
-  char *temp = check_executable_file_in_path(command);
+void existing_command(char **command, int count) {
+  char *command_token = command[0];
+  char *temp = check_executable_file_in_path(command_token);
   if (!temp) {
-    printf("%s: command not found", command);
+    printf("%s: command not found", command_token);
     printf("\n");
   }
   else { // handle the arguement
-    char *argument_array[MAX_ARGUMENT_COUNT];
-    int count = 0;
-    argument_array[count++] = strdup(command);
-    char *token = strtok_r(NULL, " \t", argument_str);
-    while (token != NULL) {
-      argument_array[count++] = strdup(token);
-      if (count >= MAX_ARGUMENT_COUNT) {
-        perror("More than 100 argumeants!!! What are you doing?");
-        exit(1);
-      }
-      token = strtok_r(NULL, " \t", argument_str);
+    char **argument_list = malloc(sizeof(char *) * (count + 1));
+    for (int i = 0; i < count; i++) {
+      argument_list[i] = strdup(command[i]);
     }
-    argument_array[count] = NULL;
+    argument_list[count] = NULL;
     pid_t pid = fork();
     if (pid == 0) { // child process
-      execv(temp, argument_array);
-      printf("%s: command not found\n", command);
+      execv(temp, argument_list);
+      printf("%s: command not found\n", argument_list[0]);
       exit(1);
     }
     wait(NULL); // wait for child process
-
-    // free allocated memory
     for (int i = 0; i < count; i++) {
-      free(argument_array[i]);
+      free(argument_list[i]);
     }
+    free(argument_list);
   }
 }
