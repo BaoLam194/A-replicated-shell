@@ -1,5 +1,6 @@
 #include "helper.h"
-
+// These function behaves with many arguments
+// as we execute each argument independently
 void echo_command(char *argument) { printf("%s ", argument); }
 void type_command(char *argument) {
   if (strcmp(argument, "type") == 0 || strcmp(argument, "exit") == 0 ||

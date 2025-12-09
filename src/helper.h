@@ -16,7 +16,6 @@ typedef enum { // use as
   NORMAL = 1 << 1,
   SINGLE_QUOTE = 1 << 2,
   DOUBLE_QUOTE = 1 << 3,
-  BACKSLASH = 1 << 4
 } state;
 
 // To support the type command

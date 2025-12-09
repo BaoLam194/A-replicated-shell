@@ -174,10 +174,24 @@ char **parse_input(char *input, int *count) {
   char **result = malloc(sizeof(char *) * MAX_ARGUMENT_COUNT);
   char token[MAX_ARGUMENT_LENGTH];
   int cur_len = 0;
+  bool escaped = false;
   for (int i = 0; i <= end; i++) {
     switch (flag) {
     case NORMAL: {
-      if (i == end || input[i] == ' ' || input[i] == '\t') { // Delimiter
+      if (escaped) { // if it was escaped
+        if (cur_len >= MAX_ARGUMENT_LENGTH - 1) {
+          printf("Argument too lengthy, you have %d\n", cur_len);
+          exit(1);
+        }
+        token[cur_len++] = input[i];
+        token[cur_len] = '\0';
+        escaped = 0;
+        continue;
+      }
+      if (input[i] == '\\') {
+        escaped = true;
+      }
+      else if (i == end || input[i] == ' ' || input[i] == '\t') { // Delimiter
         if (!cur_len)
           break;
         else {
@@ -190,6 +204,7 @@ char **parse_input(char *input, int *count) {
         flag = SINGLE_QUOTE;
       else if (input[i] == '\"')
         flag = DOUBLE_QUOTE;
+
       else { // Normal case
         if (cur_len >= MAX_ARGUMENT_LENGTH - 1) {
           printf("Argument too lengthy, you have %d\n", cur_len);
@@ -215,7 +230,25 @@ char **parse_input(char *input, int *count) {
       break;
     }
     case DOUBLE_QUOTE: {
-      if (input[i] == '\"') {
+      if (escaped) { // if it was escaped
+        if (cur_len >= MAX_ARGUMENT_LENGTH - 1) {
+          printf("Argument too lengthy, you have %d\n", cur_len);
+          exit(1);
+        }
+        if (input[i] != '\"' && input[i] != '\\' && input[i] != '$' &&
+            input[i] != '`') {
+          token[cur_len++] = '\\';
+          token[cur_len] = '\0';
+        }
+        token[cur_len++] = input[i];
+        token[cur_len] = '\0';
+        escaped = 0;
+        continue;
+      }
+      if (input[i] == '\\') {
+        escaped = true;
+      }
+      else if (input[i] == '\"') {
         flag = NORMAL;
       }
       else {
@@ -227,8 +260,6 @@ char **parse_input(char *input, int *count) {
         token[cur_len] = '\0';
       }
       break;
-    }
-    case BACKSLASH: {
     }
     default: {
       break;
