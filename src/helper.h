@@ -40,3 +40,9 @@ char *check_executable_file_in_path(const char *file);
 #include <sys/stat.h>
 bool check_path_to_dir(char *path, char *from, char **dest);
 int my_max(int a, int b);
+
+// Auto completion
+char **command_completion(const char *text, int start, int end); // the list of completion
+char *command_generator(const char *text, int state);
+extern const char *BUILT_IN_COMMAND[];
+extern const int BUILT_IN_SIZE;

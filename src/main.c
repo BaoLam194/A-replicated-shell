@@ -7,6 +7,8 @@ int main(int argc, char *argv[]) {
   // Flush after every printf
   setbuf(stdout, NULL);
   char *cwd = getcwd(NULL, 0);
+  rl_attempted_completion_function = command_completion;
+  // Tab -> this attempted completion -> completion -> update shell
   while (1) {
     // Maybe handle cwd
     char *input = readline("$ ");
