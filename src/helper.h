@@ -8,6 +8,7 @@
 #define MAX_ARGUMENT_LENGTH 1024
 
 // Command to execute
+bool is_built_in(char *command);
 bool built_in_command(char **command, int count, char **cwd);
 void existing_command(char **command, int count);
 char **parse_input(char *input, int *count);

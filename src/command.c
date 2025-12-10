@@ -1,17 +1,27 @@
 #include "helper.h"
+
+bool is_built_in(char *command) {
+  if (strcmp(command, "type") == 0 || strcmp(command, "exit") == 0 ||
+      strcmp(command, "echo") == 0 || strcmp(command, "pwd") == 0 ||
+      strcmp(command, "cd") == 0) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
 // These function behaves with many arguments
 // as we execute each argument independently
 void echo_command(char *argument) { printf("%s ", argument); }
 void type_command(char *argument) {
-  if (strcmp(argument, "type") == 0 || strcmp(argument, "exit") == 0 ||
-      strcmp(argument, "echo") == 0 || strcmp(argument, "pwd") == 0 ||
-      strcmp(argument, "cd") == 0) {
+  if (is_built_in(argument)) {
     printf("%s is a shell builtin", argument);
   }
   else { // if not built in
     char *temp = check_executable_file_in_path(argument);
     if (!temp)
-      printf("%s: not found", argument);
+      fprintf(stderr, "%s: not found", argument);
     else {
       printf("%s is %s", argument, temp);
       free(temp); // free the allocated memory
@@ -36,7 +46,7 @@ bool built_in_command(char **command, int count, char **cwd) {
   }
   else if (strcmp(command_token, "pwd") == 0) { // pwd command
     if (*cwd == NULL) {
-      printf("Current working directory not found");
+      fprintf(stderr, "Current working directory not found");
       exit(1);
     }
     printf("%s\n", *cwd);
@@ -44,7 +54,7 @@ bool built_in_command(char **command, int count, char **cwd) {
   }
   else if (strcmp(command_token, "cd") == 0) {
     if (count > 2) {
-      printf("%s: too many arguments", command_token);
+      fprintf(stderr, "%s: too many arguments", command_token);
       return true;
     }
     char *temp = command[1];
@@ -62,7 +72,7 @@ bool built_in_command(char **command, int count, char **cwd) {
       }
     }
     else {
-      printf("cd: %s: No such file or directory\n", temp);
+      fprintf(stderr, "cd: %s: No such file or directory\n", temp);
     }
     return true;
   }
@@ -80,7 +90,7 @@ void existing_command(char **command, int count) {
   char *command_token = command[0];
   char *temp = check_executable_file_in_path(command_token);
   if (!temp) {
-    printf("%s: command not found", command_token);
+    fprintf(stderr, "%s: command not found", command_token);
     printf("\n");
   }
   else { // handle the arguement
@@ -92,7 +102,8 @@ void existing_command(char **command, int count) {
     pid_t pid = fork();
     if (pid == 0) { // child process
       execv(temp, argument_list);
-      printf("%s: command not found\n", argument_list[0]);
+      // If error then these code will be executed
+      fprintf(stderr, "%s: command not found\n", argument_list[0]);
       exit(1);
     }
     wait(NULL); // wait for child process

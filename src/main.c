@@ -22,9 +22,10 @@ int main(int argc, char *argv[]) {
       printf("No arguments provided \?\?\?\n");
       return 0;
     }
-    // Take out the command only and check
-    if (built_in_command(mod_input, count, &cwd)) {
+    // Check which type of command for better handle
+    if (is_built_in(mod_input[0])) {
       // It is built_in command
+      built_in_command(mod_input, count, &cwd);
     }
     else { // check if command exists in path and executable
       existing_command(mod_input, count);
