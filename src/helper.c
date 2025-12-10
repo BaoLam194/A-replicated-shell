@@ -70,7 +70,7 @@ bool check_path_to_dir(char *path, char *from, char **dest) {
     while (token != NULL) {
       path_split_1[count_1++] = strdup(token);
       if (count_1 >= MAX_ARGUMENT_COUNT) {
-        perror("More than 100 argumeants!!! What are you doing?");
+        fprintf(stderr, "More than 100 argumeants!!! What are you doing?");
         exit(1);
       }
       token = strtok_r(NULL, "/", &saveptr_1);
@@ -85,7 +85,7 @@ bool check_path_to_dir(char *path, char *from, char **dest) {
     while (token != NULL) {
       path_split_2[count_2++] = strdup(token);
       if (count_2 >= MAX_ARGUMENT_COUNT) {
-        perror("More than 100 argumeants!!! What are you doing?");
+        fprintf(stderr, "More than 100 argumeants!!! What are you doing?");
         exit(1);
       }
       token = strtok_r(NULL, "/", &saveptr_2);
@@ -111,7 +111,7 @@ bool check_path_to_dir(char *path, char *from, char **dest) {
       else {
         path_split_2[count_2++] = strdup(path_split_1[i]);
         if (count_2 >= MAX_ARGUMENT_COUNT) {
-          perror("More than 100 argumeants!!! What are you doing?");
+          fprintf(stderr, "More than 100 argumeants!!! What are you doing?");
           exit(1);
         }
       }
@@ -163,24 +163,24 @@ bool check_path_to_dir(char *path, char *from, char **dest) {
 int my_max(int a, int b) { return (a > b) ? a : b; }
 
 // Parse the input and store number of arguments into count, count should be 0
-char **parse_input(char *input, int *count) {
+char **parse_input(char *input, int *count, int *flag) {
   if (*count != 0) {
-    printf("You give no argument to parse input");
+    fprintf(stderr, "You give no argument to parse input");
     exit(1);
     return NULL;
   }
   int end = strlen(input);
-  state flag = NORMAL;
+  state state = NORMAL;
   char **result = malloc(sizeof(char *) * MAX_ARGUMENT_COUNT);
   char token[MAX_ARGUMENT_LENGTH];
   int cur_len = 0;
   bool escaped = false;
   for (int i = 0; i <= end; i++) {
-    switch (flag) {
+    switch (state) {
     case NORMAL: {
       if (escaped) { // if it was escaped
         if (cur_len >= MAX_ARGUMENT_LENGTH - 1) {
-          printf("Argument too lengthy, you have %d\n", cur_len);
+          fprintf(stderr, "Argument too lengthy, you have %d\n", cur_len);
           exit(1);
         }
         token[cur_len++] = input[i];
@@ -201,13 +201,14 @@ char **parse_input(char *input, int *count) {
         }
       }
       else if (input[i] == '\'')
-        flag = SINGLE_QUOTE;
+        state = SINGLE_QUOTE;
       else if (input[i] == '\"')
-        flag = DOUBLE_QUOTE;
-
+        state = DOUBLE_QUOTE;
+      else if (input[i] == '>') // if redirection appears
+        *flag = 1;
       else { // Normal case
         if (cur_len >= MAX_ARGUMENT_LENGTH - 1) {
-          printf("Argument too lengthy, you have %d\n", cur_len);
+          fprintf(stderr, "Argument too lengthy, you have %d\n", cur_len);
           exit(1);
         }
         token[cur_len++] = input[i];
@@ -217,11 +218,11 @@ char **parse_input(char *input, int *count) {
     }
     case SINGLE_QUOTE: {
       if (input[i] == '\'') {
-        flag = NORMAL;
+        state = NORMAL;
       }
       else {
         if (cur_len >= MAX_ARGUMENT_LENGTH - 1) {
-          printf("Argument too lengthy, you have %d\n", cur_len);
+          fprintf(stderr, "Argument too lengthy, you have %d\n", cur_len);
           exit(1);
         }
         token[cur_len++] = input[i];
@@ -232,7 +233,7 @@ char **parse_input(char *input, int *count) {
     case DOUBLE_QUOTE: {
       if (escaped) { // if it was escaped
         if (cur_len >= MAX_ARGUMENT_LENGTH - 1) {
-          printf("Argument too lengthy, you have %d\n", cur_len);
+          fprintf(stderr, "Argument too lengthy, you have %d\n", cur_len);
           exit(1);
         }
         if (input[i] != '\"' && input[i] != '\\' && input[i] != '$' &&
@@ -249,11 +250,11 @@ char **parse_input(char *input, int *count) {
         escaped = true;
       }
       else if (input[i] == '\"') {
-        flag = NORMAL;
+        state = NORMAL;
       }
       else {
         if (cur_len >= MAX_ARGUMENT_LENGTH - 1) {
-          printf("Argument too lengthy, you have %d\n", cur_len);
+          fprintf(stderr, "Argument too lengthy, you have %d\n", cur_len);
           exit(1);
         }
         token[cur_len++] = input[i];
@@ -266,8 +267,9 @@ char **parse_input(char *input, int *count) {
     }
     }
   }
-  if (flag != NORMAL) {
-    printf("You illegally leave some special characters alone");
+  if (state != NORMAL) {
+    fprintf(stderr, "You illegally leave some special characters alone");
+    exit(1);
   }
   return result;
 }

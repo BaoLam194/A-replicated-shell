@@ -16,8 +16,9 @@ int main(int argc, char *argv[]) {
     // Tokenize the input
     char copy_input[MAX_COMMAND_LENGTH]; // maybe we need input again
     memcpy(copy_input, input, sizeof(input));
-    int count = 0;
-    char **mod_input = parse_input(copy_input, &count);
+    int count = 0, flag = 0; // currently the flag is for redirection, may
+                             // change if there is better way to handle
+    char **mod_input = parse_input(copy_input, &count, &flag);
     if (!count) {
       printf("No arguments provided \?\?\?\n");
       return 0;
@@ -25,7 +26,7 @@ int main(int argc, char *argv[]) {
     // Check which type of command for better handle
     if (is_built_in(mod_input[0])) {
       // It is built_in command
-      execute_built_in(mod_input, count, &cwd);
+      handle_built_in(mod_input, count, &cwd, flag);
     }
     else { // check if command exists in path and executable
       execute_existing(mod_input, count);

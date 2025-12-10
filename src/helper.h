@@ -10,8 +10,9 @@
 // Command to execute
 bool is_built_in(char *command);
 void execute_built_in(char **command, int count, char **cwd);
+void handle_built_in(char **command, int count, char **cwd, int flag);
 void execute_existing(char **command, int count);
-char **parse_input(char *input, int *count);
+char **parse_input(char *input, int *count, int *flag);
 typedef enum { // use as
   NORMAL = 1,
   SINGLE_QUOTE = 2,

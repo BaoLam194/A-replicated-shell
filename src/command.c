@@ -85,6 +85,11 @@ void execute_built_in(char **command, int count, char **cwd) {
   return;
 }
 
+void handle_built_in(char **command, int count, char **cwd, int flag) {
+  if (flag == 0)
+    execute_built_in(command, count, cwd);
+}
+
 // Need to modify the saveptr so **
 void execute_existing(char **command, int count) {
   char *command_token = command[0];
