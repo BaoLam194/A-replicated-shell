@@ -20,8 +20,7 @@ void type_command(char *argument) {
   printf("\n");
 }
 
-bool built_in_command(char **command, char *argument_str, int count,
-                      char **cwd) {
+bool built_in_command(char **command, int count, char **cwd) {
 
   char *command_token = command[0];
   if (strcmp(command_token, "exit") == 0) { // exit command
@@ -57,6 +56,9 @@ bool built_in_command(char **command, char *argument_str, int count,
       else {
         *cwd = strdup(to);
         free(to);
+      }
+      if (chdir(*cwd) != 0) { // Changing the directory accordingly
+        perror("There is error changing directory: ");
       }
     }
     else {

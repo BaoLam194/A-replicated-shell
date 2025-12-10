@@ -12,10 +12,8 @@ int main(int argc, char *argv[]) {
     fgets(input, sizeof(input), stdin);
     // Remove trailing end-line and add null byte
     input[strcspn(input, "\n")] = '\0';
-    //
+
     // Tokenize the input
-    char *saveptr1;
-    char *command_token;
     char copy_input[MAX_COMMAND_LENGTH]; // maybe we need input again
     memcpy(copy_input, input, sizeof(input));
     int count = 0;
@@ -25,7 +23,7 @@ int main(int argc, char *argv[]) {
       return 0;
     }
     // Take out the command only and check
-    if (built_in_command(mod_input, saveptr1, count, &cwd)) {
+    if (built_in_command(mod_input, count, &cwd)) {
       // It is built_in command
     }
     else { // check if command exists in path and executable
