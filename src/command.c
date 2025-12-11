@@ -1,6 +1,7 @@
 #include "helper.h"
 #include <readline/history.h>
 #include <readline/readline.h>
+#include <stdio.h>
 bool is_built_in(char *command) {
   if (strcmp(command, "type") == 0 || strcmp(command, "exit") == 0 || strcmp(command, "echo") == 0 ||
       strcmp(command, "pwd") == 0 || strcmp(command, "cd") == 0 || strcmp(command, "history") == 0) {
@@ -38,18 +39,36 @@ void type_command(char *argument) {
   }
   printf("\n");
 }
+void history_command(int len, char **command) {
+  if (command == NULL) { // Default behaviour,
+    HIST_ENTRY **my_his = history_list();
+    int start;
+    if (len == -1) {
+      start = 0;
+    }
+    else {
+      start = history_length - len;
+    }
+    for (start; my_his[start] != NULL; start++) {
+      printf(" %d %s\n", start + 1, my_his[start]->line);
+    }
+  }
+  else { // Flag etc : -n, -r
+    if (strcmp(command[1], "-r") == 0) {
 
-void history_command(char **argument, int len) {
-  HIST_ENTRY **my_his = history_list();
-  int start;
-  if (len == -1) {
-    start = 0;
-  }
-  else {
-    start = history_length - len;
-  }
-  for (start; my_his[start] != NULL; start++) {
-    printf(" %d %s\n", start + 1, my_his[start]->line);
+      FILE *fp;
+      char buffer[MAX_ARGUMENT_LENGTH];
+      if ((fp = fopen(command[2], "r")) == NULL) {
+        fprintf(stderr, "%s: file not found", command[2]);
+        return;
+      }
+
+      while ((fgets(buffer, sizeof(buffer), fp)) != NULL) {
+        buffer[strcspn(buffer, "\n")] = '\0';
+        add_history(buffer);
+      }
+      fclose(fp);
+    }
   }
 }
 // execute
@@ -107,18 +126,21 @@ void execute_built_in(char **command, int count, char **cwd) {
   }
   else if (strcmp(command_token, "history") == 0) {
     if (count == 1)
-      history_command(command, -1);
+      history_command(-1, NULL);
     else if (command[1][0] == '-') { // arugment to handle : )
+      if (count != 3) {
+        fprintf(stderr, "%d: invalid number of arguments\n", count);
+      }
+      history_command(-1, command);
     }
     else { // must fall into number
-
       char *end;
       long val = strtol(command[1], &end, 10);
       if (*end != '\0') {
         fprintf(stderr, "%s: %s: invalid option\n", command_token, command[1]);
       }
       else {
-        history_command(command, (int)val);
+        history_command((int)val, NULL);
       }
     }
   }
