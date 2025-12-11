@@ -46,3 +46,4 @@ char **command_completion(const char *text, int start, int end); // the list of 
 char *command_generator(const char *text, int state);
 extern const char *BUILT_IN_COMMAND[];
 extern const int BUILT_IN_SIZE;
+#include <dirent.h> // For reading the directory
