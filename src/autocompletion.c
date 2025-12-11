@@ -7,7 +7,7 @@
 const char *BUILT_IN_COMMAND[] = {"echo", "pwd", "cd", "exit", "type"};
 const int BUILT_IN_SIZE = sizeof(BUILT_IN_COMMAND) / sizeof(BUILT_IN_COMMAND[0]);
 // This to reduce duplicates and unnecessary command
-// Return string array wiht NULL terminated
+// Return string array with NULL terminated
 char **list_executable_in_path(const char *text, int len) {
   char *path, *saveptr;
   char *paths = strdup(getenv("PATH"));
@@ -28,7 +28,11 @@ char **list_executable_in_path(const char *text, int len) {
 
     while ((entry = readdir(directory)) != NULL) {
       if (strncmp(text, entry->d_name, len) == 0) {
-        result[count++] = strdup(entry->d_name);
+        char temp[MAX_ARGUMENT_LENGTH];
+        snprintf(temp, MAX_ARGUMENT_LENGTH, "%s/%s", path, entry->d_name);
+        if (access(temp, F_OK | X_OK) == 0) {
+          result[count++] = strdup(entry->d_name);
+        }
       }
     }
     closedir(directory);
