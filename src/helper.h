@@ -49,3 +49,8 @@ char *command_generator(const char *text, int state);
 extern const char *BUILT_IN_COMMAND[];
 extern const int BUILT_IN_SIZE;
 #include <dirent.h> // For reading the directory
+
+// History
+void read_my_history(char *file);
+void write_my_history(char *file);
+void append_my_history(char *file);

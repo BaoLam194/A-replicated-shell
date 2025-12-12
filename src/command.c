@@ -55,45 +55,13 @@ void history_command(int len, char **command) {
   }
   else {                                 // Flag etc : -n, -r
     if (strcmp(command[1], "-r") == 0) { // read
-      FILE *fp;
-      char buffer[MAX_ARGUMENT_LENGTH];
-      if ((fp = fopen(command[2], "r")) == NULL) {
-        fprintf(stderr, "%s: file not found", command[2]);
-        return;
-      }
-
-      while ((fgets(buffer, sizeof(buffer), fp)) != NULL) {
-        buffer[strcspn(buffer, "\n")] = '\0';
-        add_history(buffer);
-      }
-      fclose(fp);
+      read_my_history(command[2]);
     }
     else if (strcmp(command[1], "-w") == 0) { // write
-      FILE *fp;
-      if ((fp = fopen(command[2], "w")) == NULL) {
-        fprintf(stderr, "%s: error open file", command[2]);
-        return;
-      }
-      HIST_ENTRY **my_his = history_list();
-      int start;
-      for (start = 0; my_his[start] != NULL; start++) {
-        fprintf(fp, "%s\n", my_his[start]->line);
-      }
-      fclose(fp);
+      write_my_history(command[2]);
     }
     else if (strcmp(command[1], "-a") == 0) { // append
-      FILE *fp;
-      if ((fp = fopen(command[2], "a")) == NULL) {
-        fprintf(stderr, "%s: error open file", command[2]);
-        return;
-      }
-      HIST_ENTRY **my_his = history_list();
-      int it;
-      for (it = current_offset_for_write; my_his[it] != NULL; it++) {
-        fprintf(fp, "%s\n", my_his[it]->line);
-      }
-      current_offset_for_write = history_length;
-      fclose(fp);
+      append_my_history(command[2]);
     }
   }
 }
