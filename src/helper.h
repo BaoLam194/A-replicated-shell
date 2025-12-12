@@ -6,6 +6,8 @@
 #define MAX_COMMAND_LENGTH 1024
 #define MAX_ARGUMENT_COUNT 100
 #define MAX_ARGUMENT_LENGTH 1024
+void initialize();
+extern int current_offset_for_write;
 
 // Command to execute
 #include <fcntl.h> // For open()

@@ -1,4 +1,17 @@
 #include "helper.h"
+#include <readline/history.h>
+#include <readline/readline.h>
+
+int current_offset_for_write = 0;
+// For readline and history
+void initialize() {
+  // Flush after every printf
+  setbuf(stdout, NULL);
+  rl_attempted_completion_function = command_completion;
+  // Tab -> this attempted completion -> completion -> update shell
+  // Enable history
+}
+
 char *check_executable_file_in_path(const char *file) {
   // Get path variable and split
   char *split, *savepath;
@@ -181,7 +194,11 @@ char **parse_input(char *input, int *count, int *flag) {
       if (escaped) { // if it was escaped
         if (cur_len >= MAX_ARGUMENT_LENGTH - 1) {
           fprintf(stderr, "Argument too lengthy, you have %d\n", cur_len);
-          exit(1);
+          for (int j = 0; j < *count; j++) {
+            free(result[j]);
+          }
+          free(result);
+          return NULL;
         }
         token[cur_len++] = input[i];
         token[cur_len] = '\0';
@@ -208,7 +225,11 @@ char **parse_input(char *input, int *count, int *flag) {
       else { // Normal case
         if (cur_len >= MAX_ARGUMENT_LENGTH - 1) {
           fprintf(stderr, "Argument too lengthy, you have %d\n", cur_len);
-          exit(1);
+          for (int j = 0; j < *count; j++) {
+            free(result[j]);
+          }
+          free(result);
+          return NULL;
         }
         if (input[i] == '>') // if redirection appears
           *flag = 1;
@@ -224,7 +245,11 @@ char **parse_input(char *input, int *count, int *flag) {
       else {
         if (cur_len >= MAX_ARGUMENT_LENGTH - 1) {
           fprintf(stderr, "Argument too lengthy, you have %d\n", cur_len);
-          exit(1);
+          for (int j = 0; j < *count; j++) {
+            free(result[j]);
+          }
+          free(result);
+          return NULL;
         }
         token[cur_len++] = input[i];
         token[cur_len] = '\0';
@@ -235,7 +260,11 @@ char **parse_input(char *input, int *count, int *flag) {
       if (escaped) { // if it was escaped
         if (cur_len >= MAX_ARGUMENT_LENGTH - 1) {
           fprintf(stderr, "Argument too lengthy, you have %d\n", cur_len);
-          exit(1);
+          for (int j = 0; j < *count; j++) {
+            free(result[j]);
+          }
+          free(result);
+          return NULL;
         }
         if (input[i] != '\"' && input[i] != '\\' && input[i] != '$' && input[i] != '`') {
           token[cur_len++] = '\\';
@@ -255,7 +284,11 @@ char **parse_input(char *input, int *count, int *flag) {
       else {
         if (cur_len >= MAX_ARGUMENT_LENGTH - 1) {
           fprintf(stderr, "Argument too lengthy, you have %d\n", cur_len);
-          exit(1);
+          for (int j = 0; j < *count; j++) {
+            free(result[j]);
+          }
+          free(result);
+          return NULL;
         }
         token[cur_len++] = input[i];
         token[cur_len] = '\0';
@@ -268,8 +301,12 @@ char **parse_input(char *input, int *count, int *flag) {
     }
   }
   if (state != NORMAL) {
-    fprintf(stderr, "You illegally leave some special characters alone");
-    exit(1);
+    fprintf(stderr, "You illegally leave some special characters alone\n");
+    for (int j = 0; j < *count; j++) {
+      free(result[j]);
+    }
+    free(result);
+    return NULL;
   }
   return result;
 }

@@ -4,12 +4,8 @@
 #include <stdio.h>
 
 int main(int argc, char *argv[]) {
-  // Flush after every printf
-  setbuf(stdout, NULL);
+  initialize(); // set thing up for readline etc
   char *cwd = getcwd(NULL, 0);
-  rl_attempted_completion_function = command_completion;
-  // Tab -> this attempted completion -> completion -> update shell
-  // Enable history
   using_history();
   while (1) {
     // Maybe handle cwd
@@ -25,8 +21,11 @@ int main(int argc, char *argv[]) {
                              // change if there is better way to handle
     char **mod_input = parse_input(input, &count, &flag);
     if (!count) {
-      printf("No arguments provided \?\?\?\n");
+      fprintf(stderr, "No arguments provided \?\?\?\n");
       return 0;
+    }
+    if (!mod_input) {
+      continue;
     }
     // Check which type of command for better handle
     handle_command(mod_input, count, &cwd, flag);

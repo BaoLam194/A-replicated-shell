@@ -88,10 +88,11 @@ void history_command(int len, char **command) {
         return;
       }
       HIST_ENTRY **my_his = history_list();
-      int start;
-      for (start = 0; my_his[start] != NULL; start++) {
-        fprintf(fp, "%s\n", my_his[start]->line);
+      int it;
+      for (it = current_offset_for_write; my_his[it] != NULL; it++) {
+        fprintf(fp, "%s\n", my_his[it]->line);
       }
+      current_offset_for_write = history_length;
       fclose(fp);
     }
   }
@@ -154,7 +155,7 @@ void execute_built_in(char **command, int count, char **cwd) {
       history_command(-1, NULL);
     else if (command[1][0] == '-') { // arugment to handle : )
       if (count != 3) {
-        fprintf(stderr, "%d: invalid number of arguments\n", count);
+        fprintf(stderr, "%d: too many arguments\n", count);
       }
       history_command(-1, command);
     }
